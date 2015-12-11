@@ -1,23 +1,38 @@
 package com.framgia.elsytem;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.framgia.elsytem.model.User;
+import com.framgia.elsytem.mypackage.AlertDialogManager;
+import com.framgia.elsytem.mypackage.UserFunctions;
 
 public class RegisterActivity extends AppCompatActivity {
     private static int RESULT_LOAD_IMG = 1;
     String imgDecodableString;
+    private static String mEmail, mPassword, mPasswordConfirmation, mFullName;
+    private static EditText mEtEmail, mEtPassword, mEtPasswordConfirmation, mEtFullName;
+    private AlertDialogManager mAlert;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +50,12 @@ public class RegisterActivity extends AppCompatActivity {
                 loadImageFromGallery(v);
             }
         });
+
+        mEtEmail = (EditText) findViewById(R.id.edit_text_email);
+        mEtPassword = (EditText) findViewById(R.id.edit_text_password);
+        mEtPasswordConfirmation = (EditText) findViewById(R.id.edit_text_retype_password);
+        mEtFullName = (EditText) findViewById(R.id.edit_text_full_name);
+        mAlert = new AlertDialogManager();
     }
 
     public void loadImageFromGallery(View view) {
@@ -52,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
                     && null != data) {
                 // Get the Image from data
                 Uri selectedImage = data.getData();
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
                 // Get the cursor
                 Cursor cursor = getContentResolver().query(selectedImage,
                         filePathColumn, null, null, null);
@@ -90,14 +111,78 @@ public class RegisterActivity extends AppCompatActivity {
                 return true;
             // Respond to the action bar's 'Done' button
             case R.id.action_done:
-                Intent updateIntent = new Intent(getApplicationContext(), UpdateProfileActivity
+                /*Intent updateIntent = new Intent(getApplicationContext(), UpdateProfileActivity
                         .class);
                 startActivity(updateIntent);
                 finish();
                 Toast.makeText(getApplicationContext(), "Will be implemented later", Toast
-                        .LENGTH_LONG).show();
+                        .LENGTH_LONG).show();*/
+                mEmail = mEtEmail.getText().toString();
+                mPassword = mEtPassword.getText().toString();
+                mPasswordConfirmation = mEtPasswordConfirmation.getText().toString();
+                mFullName = mEtFullName.getText().toString();
+                if (!isConnected())
+                    mAlert.showAlertDialog(RegisterActivity.this, "Connection failed!",
+                            "You are not connected to the Internet. Please check your network connection " +
+                                    "first.", false);
+                if (!validate(mFullName, mEmail, mPassword, mPasswordConfirmation))
+                    Toast.makeText(getBaseContext(), "Provide the required information!", Toast
+                            .LENGTH_LONG).show();
+                    // call AsynTask to perform network operation on separate thread
+                else new HttpAsyncTask().execute("https://manh-nt.herokuapp.com/users.json");
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isConnected() {
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected())
+            return true;
+        else
+            return false;
+    }
+
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+        private ProgressDialog mDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mDialog = new ProgressDialog(RegisterActivity.this);
+            mDialog.setTitle("Contacting Servers");
+            mDialog.setMessage("Signing up ...");
+            mDialog.setIndeterminate(false);
+            mDialog.setCancelable(true);
+            mDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... urls) {
+            user = new User();
+            user.setName(mFullName);
+            user.setEmail(mEmail);
+            user.setPassword(mPassword);
+            user.setPassword_confirmation(mPasswordConfirmation);
+            UserFunctions userFunction = new UserFunctions();
+            return userFunction.signUp(urls[0], user);
+        }
+
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            mDialog.dismiss();
+            Log.e("Message: ", result);
+            Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private boolean validate(String name, String email, String password, String
+            passwordConfirmation) {
+        if (name.equals("") || email.equals("") || password.equals("") || passwordConfirmation.equals(""))
+            return false;
+        else
+            return true;
     }
 }

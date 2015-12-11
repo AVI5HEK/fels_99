@@ -18,6 +18,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
     ImageView avatar;
     private static int RESULT_LOAD_IMG = 1;
     String imgDecodableString;
+    // Session Manager Class
+    //SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,9 @@ public class UpdateProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // Session class instance
+        /*session = new SessionManager(getApplicationContext());
+        session.checkLogin();*/
         avatar = (ImageView) findViewById(R.id.image_upload_avatar);
         avatar.setOnClickListener(new View.OnClickListener() {
             @Override
