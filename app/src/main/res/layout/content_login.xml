@@ -70,13 +70,25 @@
         android:layout_below="@id/image_password"
         android:hint="@string/text_password_activity_login"
         android:inputType="textPassword"/>
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/check_remember"
+        android:layout_below="@id/edit_text_password"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/check_remember_activity_login"
+        android:textSize="@dimen/text_email_activity_login_text_size"
+        android:layout_toRightOf="@id/check_remember"
+        android:layout_below="@id/edit_text_password"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="@string/text_validation_activity_login"
         android:id="@+id/text_validation"
-        android:layout_below="@id/edit_text_password"
+        android:layout_below="@id/check_remember"
         android:textColor="@android:color/holo_red_dark"
         android:visibility="invisible"/>
     <Button

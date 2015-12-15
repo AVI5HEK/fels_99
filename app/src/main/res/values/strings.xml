@@ -28,4 +28,16 @@
     <string name="title_activity_update_profile">Update profile</string>
     <string name="text_old_password_activity_update_profile">Old password</string>
     <string name="text_new_password_activity_update_profile">New password</string>
+    <string name="check_remember_activity_login">Remember me</string>
+    <string name="connection_error_title_activity_login">Connection failed!</string>
+    <string name="connection_error_message_activity_login">You are not connected to the Internet.
+        Please check your network connection first.</string>
+    <string name="empty_email_activity_login">Email field empty!</string>
+    <string name="empty_password_activity_login">Password field empty!</string>
+    <string name="empty_email_password_activity_login">Email and Password fields are empty!</string>
+    <string name="invalid_username_password_message">Invalid email/password combination</string>
+    <string name="activity_main_alert_dialog_message">Want to logout?</string>
+    <string name="activity_main_alert_dialog_title">Log Out</string>
+    <string name="activity_main_alert_dialog_yes">Yes</string>
+    <string name="activity_main_alert_dialog_no">No</string>
 </resources>

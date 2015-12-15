@@ -127,7 +127,7 @@
         android:layout_below="@id/edit_text_retype_password"
         android:layout_marginLeft="@dimen/text_email_activity_login_margin_left"
         android:layout_toRightOf="@id/image_full_name"
-        android:text="@string/text_full_name_activity_register"
+        android:text="@string/edit_text_full_name_activity_register"
         android:textSize="@dimen/text_email_activity_login_text_size"
         android:textStyle="bold"/>
 
