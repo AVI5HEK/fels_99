@@ -1,6 +1,7 @@
 package com.framgia.elsytem;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -8,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -99,17 +101,21 @@ public class UpdateProfileActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                new HttpAsyncTaskSignOut().execute("https://manh-nt.herokuapp.com/logout.json");
+                logOut();
                 return true;
             // Respond to the action bar's 'Done' button
             case R.id.action_update:
                 /*Toast.makeText(getApplicationContext(), "Will be implemented later", Toast
                         .LENGTH_LONG).show();*/
-                new HttpAsyncTaskUpdateProfile().execute("https://manh-nt.herokuapp.com/users/1" +
-                        ".json");
+                new HttpAsyncTaskUpdateProfile().execute("https://manh-nt.herokuapp.com/categories/1/lessons.json");
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        logOut();
     }
 
     private class HttpAsyncTaskUpdateProfile extends AsyncTask<String, Void, String> {
@@ -130,7 +136,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
             Profile profile = new Profile();
             UserFunctions userFunction = new UserFunctions();
-            return userFunction.updateProfile(urls[0], profile);
+            return userFunction.updateProfile(urls[0]);
         }
 
         // onPostExecute displays the results of the AsyncTask.
@@ -173,5 +179,27 @@ public class UpdateProfileActivity extends AppCompatActivity {
             Log.e(TAG, result);
             Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void logOut() {
+        // dialog box
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setTitle(R.string.activity_main_alert_dialog_title)
+                .setMessage(R.string.activity_main_alert_dialog_message)
+                .setPositiveButton(R.string.activity_main_alert_dialog_yes, new DialogInterface
+                        .OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new HttpAsyncTaskSignOut().execute("https://manh-nt.herokuapp.com/logout.json");
+                    }
+                })
+                .setNegativeButton(R.string.activity_main_alert_dialog_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
     }
 }

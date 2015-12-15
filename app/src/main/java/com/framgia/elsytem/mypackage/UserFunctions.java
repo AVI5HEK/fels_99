@@ -2,7 +2,6 @@ package com.framgia.elsytem.mypackage;
 
 import android.util.Log;
 
-import com.framgia.elsytem.model.Profile;
 import com.framgia.elsytem.model.User;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
@@ -10,6 +9,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -113,15 +113,45 @@ public class UserFunctions {
         return result;
     }
 
-    public String updateProfile(String url, Profile profile) {
+    public String updateProfile(String url) {
 
         String result = "";
         try {
             String json;
             // 1. build jsonObject
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", 3);
-            json = jsonObject.toString();
+            JSONObject parent = new JSONObject();
+            JSONObject lesson = new JSONObject();
+            lesson.put("id", 1);
+            lesson.put("name", "#1");
+            JSONObject word = new JSONObject();
+            word.put("id", 1);
+            word.put("content", "Framgia");
+            JSONArray answer = new JSONArray();
+            JSONObject answer_1 = new JSONObject();
+            answer_1.put("id", 1);
+            answer_1.put("content", "framui");
+            answer_1.put("is_correct", false);
+            JSONObject answer_2 = new JSONObject();
+            answer_2.put("id", 2);
+            answer_2.put("content", "framgia");
+            answer_2.put("is_correct", true);
+            JSONObject answer_3 = new JSONObject();
+            answer_3.put("id", 3);
+            answer_3.put("content", "frmgia");
+            answer_3.put("is_correct", false);
+            JSONObject answer_4 = new JSONObject();
+            answer_4.put("id", 4);
+            answer_4.put("content", "gtgia");
+            answer_4.put("is_correct", false);
+            answer.put(answer_1);
+            answer.put(answer_2);
+            answer.put(answer_3);
+            answer.put(answer_4);
+            word.put("answers", answer);
+            lesson.put("words", word);
+            parent.put("lesson", lesson);
+            json = parent.toString();
+            Log.e("JSON Object: ", json);
             RequestBody requestBody = RequestBody.create(JSON, json);
             Request request = new Request.Builder().url(url).post(requestBody).build();
             Response response = okHttpClient.newCall(request).execute();

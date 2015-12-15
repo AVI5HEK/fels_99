@@ -36,4 +36,8 @@
     <string name="empty_password_activity_login">Password field empty!</string>
     <string name="empty_email_password_activity_login">Email and Password fields are empty!</string>
     <string name="invalid_username_password_message">Invalid email/password combination</string>
+    <string name="activity_main_alert_dialog_message">Want to logout?</string>
+    <string name="activity_main_alert_dialog_title">Log Out</string>
+    <string name="activity_main_alert_dialog_yes">Yes</string>
+    <string name="activity_main_alert_dialog_no">No</string>
 </resources>
