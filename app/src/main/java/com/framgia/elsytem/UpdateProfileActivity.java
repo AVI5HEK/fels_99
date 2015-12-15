@@ -39,7 +39,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // Session class instance
         /*session = new SessionManager(getApplicationContext());
         session.checkLogin();*/
         avatar = (ImageView) findViewById(R.id.image_upload_avatar);
