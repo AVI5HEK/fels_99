@@ -13,33 +13,18 @@ import java.util.HashMap;
  */
 public class SessionManager {// Shared Preferences
     SharedPreferences pref;
-
     // Editor for Shared preferences
     SharedPreferences.Editor editor;
-
     // Context
     Context _context;
-
     // Shared pref mode
     int PRIVATE_MODE = 0;
-
     // Sharedpref file name
     private static final String PREF_NAME = "FELS99";
-
     // All Shared Preferences Keys
     private static final String IS_LOGIN = "IsLoggedIn";
-
-    // User name (make variable public to access from outside)
-    public static final String KEY_NAME = "name";
-
-    // Email address (make variable public to access from outside)
-    public static final String KEY_EMAIL = "email";
-
-    // Avatar's image decodable string
-    public static final String KEY_AVATAR = "avatar";
-
-    // remember me
-    public static final String KEY_REMEMBER_TOKEN = "rememberToken";
+    // Constant keys
+    private Constants mConstants;
 
     // Constructor
     public SessionManager(Context context) {
@@ -52,22 +37,19 @@ public class SessionManager {// Shared Preferences
      * Create login session
      */
     public void createLoginSession(String name, String email, String avatar, String
-            rememberToken) {
+            rememberToken, int rememberMe) {
         // Storing login value as TRUE
         editor.putBoolean(IS_LOGIN, true);
-
         // Storing name in pref
-        editor.putString(KEY_NAME, name);
-
+        editor.putString(mConstants.KEY_NAME, name);
         // Storing email in pref
-        editor.putString(KEY_EMAIL, email);
-
+        editor.putString(mConstants.KEY_EMAIL, email);
         // Storing avatar in pref
-        editor.putString(KEY_AVATAR, avatar);
-
+        editor.putString(mConstants.KEY_AVATAR, avatar);
+        // Storing remember token
+        editor.putString(mConstants.KEY_REMEMBER_TOKEN, rememberToken);
         // Storing remember me
-        editor.putString(KEY_REMEMBER_TOKEN, rememberToken);
-
+        editor.putString(mConstants.KEY_REMEMBER_ME, Integer.toString(rememberMe));
         // commit changes
         editor.commit();
     }
@@ -79,15 +61,8 @@ public class SessionManager {// Shared Preferences
      */
     public void checkLogin() {
         // Check login status
-        if (!this.isLoggedIn()) {
-            // user is not logged in redirect him to Login Activity
-            Intent i = new Intent(_context, LoginActivity.class);
-            // Closing all the Activities
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            // Add new Flag to start new Activity
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            // Staring Login Activity
-            _context.startActivity(i);
+        if (!this.isLoggedInAndRemember()) {
+            logoutUser();
         }
     }
 
@@ -97,17 +72,15 @@ public class SessionManager {// Shared Preferences
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<String, String>();
         // user name
-        user.put(KEY_NAME, pref.getString(KEY_NAME, null));
-
+        user.put(mConstants.KEY_NAME, pref.getString(mConstants.KEY_NAME, null));
         // user email id
-        user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
-
+        user.put(mConstants.KEY_EMAIL, pref.getString(mConstants.KEY_EMAIL, null));
         // user avatar
-        user.put(KEY_AVATAR, pref.getString(KEY_AVATAR, null));
-
+        user.put(mConstants.KEY_AVATAR, pref.getString(mConstants.KEY_AVATAR, null));
+        // user remember token
+        user.put(mConstants.KEY_REMEMBER_TOKEN, pref.getString(mConstants.KEY_REMEMBER_TOKEN, null));
         // user remember me
-        user.put(KEY_REMEMBER_TOKEN, pref.getString(KEY_REMEMBER_TOKEN, null));
-
+        user.put(mConstants.KEY_REMEMBER_ME, pref.getString(mConstants.KEY_REMEMBER_ME, null));
         // return user
         return user;
     }
@@ -150,6 +123,6 @@ public class SessionManager {// Shared Preferences
      **/
     // Get Login State
     public boolean isLoggedInAndRemember() {
-        return pref.getBoolean(IS_LOGIN, false) && !getUserDetails().get(KEY_REMEMBER_TOKEN).isEmpty();
+        return isLoggedIn() && getUserDetails().get(mConstants.KEY_REMEMBER_ME).equals("1");
     }
 }

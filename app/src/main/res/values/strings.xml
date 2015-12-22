@@ -18,6 +18,9 @@
     <string name="text_required_information_activity_register">* Required information</string>
     <string name="title_activity_question">QuestionActivity</string>
     <string name="action_ok">Ok</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_turn_on_wifi">Turn on Wi-Fi</string>
+    <string name="action_turn_on_cellular_data">Turn on cellular data</string>
     <string name="title_activity_result">ResultActivity</string>
     <string name="content_main_question_number_text">20/500</string>
     <string name="content_main_word_text">Pronunciation</string>
@@ -40,6 +43,17 @@
     <string name="content_profile_words_btn_text">Words</string>
     <string name="content_profile_lesson_btn_text">Lesson</string>
     <string name="title_activity_wordlist">Words List</string>
+    <string name="contacting_servers">Contacting Servers</string>
+    <string name="signing_out">Signing out...</string>
+    <string name="signing_in">Signing in...</string>
+    <string name="updating_profile">Updating profile...</string>
+    <string name="logout_response">Logout success</string>
+    <string name="url_logout">https://manh-nt.herokuapp.com/logout.json</string>
+    <string name="url_login">https://manh-nt.herokuapp.com/login.json</string>
+    <string name="url_update_profile">https://manh-nt.herokuapp.com/users/1.json</string>
+    <string name="toast_message_try_again">Something went wrong. Please try again.</string>
+    <string name="toast_message_pick_image">You haven\'t picked any image.</string>
+    <string name="toast_message_pick_image_error">Something went wrong.</string>
     <string-array name="Category_name">
         <item>ALL</item>
         <item>Basic</item>
@@ -51,8 +65,8 @@
         <item>Learned</item>
         <item>Not learn</item>
     </string-array>
-    <string name="activity_main_alert_dialog_message">Want to logout?</string>
-    <string name="activity_main_alert_dialog_title">Log Out</string>
+    <string name="activity_main_alert_dialog_message">Want to log out?</string>
+    <string name="activity_main_alert_dialog_title">Logout</string>
     <string name="activity_main_alert_dialog_yes">Yes</string>
     <string name="activity_main_alert_dialog_no">No</string>
     <string name="choice_text_1">choice 1</string>

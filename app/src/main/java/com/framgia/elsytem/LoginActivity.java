@@ -2,11 +2,15 @@ package com.framgia.elsytem;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -17,8 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.framgia.elsytem.model.User;
 import com.framgia.elsytem.jsonResponse.UserResponse;
+import com.framgia.elsytem.model.User;
 import com.framgia.elsytem.mypackage.AlertDialogManager;
 import com.framgia.elsytem.mypackage.SessionManager;
 import com.framgia.elsytem.mypackage.UserFunctions;
@@ -35,13 +39,10 @@ public class LoginActivity extends AppCompatActivity {
     CheckBox checkBoxRememberMe;
     private String mEmail, mPassword;
     private int mRememberMe;
-    AlertDialogManager alert = new AlertDialogManager();
+    AlertDialogManager alert;
     SessionManager session;
     User user;
     TextView register;
-
-
-    Button profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
         // check in session if user is logged in. If so, go to profile activity
         if (session.isLoggedInAndRemember()) {
             //go to ProfileActivity
-            // going to UpdateProfileActivity for testing purpose
             Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(i);
             finish();
@@ -78,15 +78,16 @@ public class LoginActivity extends AppCompatActivity {
                     if (checkBoxRememberMe.isChecked()) mRememberMe = 1;
                     else mRememberMe = 0;
                     if (!isConnected())
-                        alert.showAlertDialog(getApplicationContext(), getString(R.string
+                        mShowDialog(LoginActivity.this, getString(R.string
                                         .connection_error_title_activity_login),
                                 getString(R.string.connection_error_message_activity_login), false);
-                    if (!mEmail.equals("") && !mPassword.equals("")) {
-                        new HttpAsyncTaskSignIn().execute("https://manh-nt.herokuapp.com/login.json");
-                    } else if (mEmail.equals("")) {
+                    if (!mEmail.isEmpty() && !mPassword.isEmpty()) {
+                        new HttpAsyncTaskSignIn().execute(getString(R.string
+                                .url_login));
+                    } else if (mEmail.isEmpty()) {
                         Toast.makeText(getApplicationContext(), getString(R.string
                                 .empty_email_activity_login), Toast.LENGTH_SHORT).show();
-                    } else if (mPassword.equals("")) {
+                    } else if (mPassword.isEmpty()) {
                         Toast.makeText(getApplicationContext(), getString(R.string
                                 .empty_password_activity_login), Toast.LENGTH_SHORT).show();
                     } else {
@@ -94,10 +95,41 @@ public class LoginActivity extends AppCompatActivity {
                                 .empty_email_password_activity_login), Toast
                                 .LENGTH_SHORT).show();
                     }
-
                 }
             });
         }
+    }
+
+    private void mShowDialog(Context context, String title, String message,
+                             Boolean status) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        // Setting Dialog Title
+        alertDialog.setTitle(title);
+        // Setting Dialog Message
+        alertDialog.setMessage(message);
+        if (status != null)
+            // Setting alert dialog icon
+            alertDialog.setIcon((status) ? R.drawable.ico_success : R.drawable.ico_fail);
+        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_cancel), new
+                DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.action_turn_on_wifi), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+            }
+        });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.action_turn_on_cellular_data), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startActivity(new Intent(Settings.ACTION_SETTINGS));
+            }
+        });
+        // Showing Alert Message
+        alertDialog.show();
     }
 
     private void initializeViews() {
@@ -122,8 +154,8 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             mDialog = new ProgressDialog(LoginActivity.this);
-            mDialog.setTitle("Contacting Servers");
-            mDialog.setMessage("Signing in ...");
+            mDialog.setTitle(getString(R.string.contacting_servers));
+            mDialog.setMessage(getString(R.string.signing_in));
             mDialog.setIndeterminate(false);
             mDialog.setCancelable(true);
             mDialog.show();
@@ -152,7 +184,6 @@ public class LoginActivity extends AppCompatActivity {
                 // showing the validation message got from json response
                 if (msg.equals(getString(R.string.invalid_username_password_message))) {
                     validation.setVisibility(View.VISIBLE);
-                    Log.e(TAG + " message: ", msg);
                 } else {
                     //getting gson data
                     UserResponse userResponse;
@@ -161,16 +192,15 @@ public class LoginActivity extends AppCompatActivity {
                     String name = userResponse.getUser().getName();
                     String email = userResponse.getUser().getEmail();
                     String avatar = userResponse.getUser().getAvatar();
-                    String rememberToken = userResponse.getUser().getRemember_token();
+                    //String rememberToken = userResponse.getUser().getRemember_token();
+                    String rememberToken = "";
                     //creating session
                     if (!name.isEmpty() && !email.isEmpty())
-                        session.createLoginSession(name, email, avatar, rememberToken);
-                    Log.e(TAG + " Name: ", name);
-                    Log.e(TAG + " Email: ", email);
-                    Log.e(TAG + " Avatar: ", avatar);
-                    Log.e(TAG + " Remembr: ", rememberToken);
-                    //now finish this activity and go to next activity
-                    //for testing purpose, I'm going to UpdateProfileActivity
+                        session.createLoginSession(name, email, avatar, rememberToken, mRememberMe);
+                    Log.e("N: ", name + " / E: " + email + " / A: " + avatar + " / RT: " +
+                            rememberToken +
+                            "/RM: " + mRememberMe);
+                    //now finish this activity and go to ProfileActivity
                     Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
                     startActivity(i);
                     finish();
@@ -178,16 +208,9 @@ public class LoginActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.e(TAG + " Message: ", result);
             if (result.isEmpty())
-                Toast.makeText(getBaseContext(), "Keep calm and try again!", Toast.LENGTH_LONG)
+                Toast.makeText(getBaseContext(), getString(R.string.toast_message_try_again), Toast.LENGTH_LONG)
                         .show();
-            else try {
-                Toast.makeText(getApplicationContext(), new JSONObject(result).getString
-                        ("message"), Toast.LENGTH_LONG).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

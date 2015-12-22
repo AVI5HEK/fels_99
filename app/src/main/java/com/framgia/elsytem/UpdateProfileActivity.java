@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.framgia.elsytem.model.Profile;
+import com.framgia.elsytem.mypackage.Constants;
 import com.framgia.elsytem.mypackage.SessionManager;
 import com.framgia.elsytem.mypackage.UserFunctions;
 
@@ -31,19 +31,12 @@ public class UpdateProfileActivity extends AppCompatActivity {
     // Session Manager Class
     SessionManager session;
     HashMap<String, String> user;
-    // User name (make variable public to access from outside)
-    public static final String KEY_NAME = "name";
-    // Email address (make variable public to access from outside)
-    public static final String KEY_EMAIL = "email";
-    // Avatar's image decodable string
-    public static final String KEY_AVATAR = "avatar";
-    // remember me
-    public static final String KEY_REMEMBER_TOKEN = "rememberToken";
     private String mEmail, mOldPassword, mNewPassword, mPasswordConfirmation, mFullName, mAvatar,
             mRememberToken;
     private EditText mEtemail, mEtOldPassword, mEtNewPassword, mEtPasswordConfirmation,
             mEtFullName;
     private ImageView mIvAvatar;
+    private Constants mConstant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +47,13 @@ public class UpdateProfileActivity extends AppCompatActivity {
         // Session class instance
         session = new SessionManager(getApplicationContext());
         user = session.getUserDetails();
-        mEtemail.setText(user.get(KEY_EMAIL));
-        mEtFullName.setText(user.get(KEY_NAME));
-        if (!user.get(KEY_AVATAR).equals("")) mIvAvatar.setImageBitmap(BitmapFactory.decodeFile(user
-                .get(KEY_AVATAR)));
-        imgDecodableString = user.get(KEY_AVATAR);
-        mRememberToken = user.get(KEY_REMEMBER_TOKEN);
+        mEtemail.setText(user.get(mConstant.KEY_EMAIL));
+        mEtFullName.setText(user.get(mConstant.KEY_NAME));
+        if (!user.get(mConstant.KEY_AVATAR).isEmpty())
+            mIvAvatar.setImageBitmap(BitmapFactory.decodeFile
+                    (user.get(mConstant.KEY_AVATAR)));
+        imgDecodableString = user.get(mConstant.KEY_AVATAR);
+        mRememberToken = user.get(mConstant.KEY_REMEMBER_TOKEN);
         mIvAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,12 +107,12 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 mIvAvatar.setImageBitmap(BitmapFactory
                         .decodeFile(imgDecodableString));
             } else {
-                Toast.makeText(this, "You haven't picked Image",
+                Toast.makeText(this, getString(R.string.toast_message_pick_image),
                         Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(this, getString(R.string.toast_message_pick_image_error), Toast
+                    .LENGTH_LONG).show();
         }
     }
 
@@ -146,7 +140,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 mNewPassword = mEtNewPassword.getText().toString();
                 mPasswordConfirmation = mEtPasswordConfirmation.getText().toString();
                 mFullName = mEtFullName.getText().toString();
-                new HttpAsyncTaskUpdateProfile().execute("https://manh-nt.herokuapp.com/users/1.json");
+                new HttpAsyncTaskUpdateProfile().execute(getString(R.string.url_update_profile));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -168,8 +162,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             mDialog = new ProgressDialog(UpdateProfileActivity.this);
-            mDialog.setTitle("Contacting Servers");
-            mDialog.setMessage("Updating profile ...");
+            mDialog.setTitle(getString(R.string.contacting_servers));
+            mDialog.setMessage(getString(R.string.updating_profile));
             mDialog.setIndeterminate(false);
             mDialog.setCancelable(true);
             mDialog.show();
@@ -184,10 +178,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
             profile.setAvatar(imgDecodableString);
             profile.setRememberToken(mRememberToken);
             UserFunctions userFunction = new UserFunctions();
-            Log.e(TAG, mFullName);
-            Log.e(TAG, mEmail);
-            Log.e(TAG, imgDecodableString);
-            Log.e(TAG, mRememberToken);
             return userFunction.updateProfile(urls[0], profile);
         }
 
@@ -199,8 +189,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
             session.deleteSessionData();
             // creating new session with updated data
             session.createLoginSession(mFullName, mEmail, imgDecodableString, user.get
-                    (KEY_REMEMBER_TOKEN));
-            Log.e(TAG, result);
+                    (mConstant.KEY_REMEMBER_TOKEN), Integer.parseInt(user.get(mConstant
+                    .KEY_REMEMBER_ME)));
             Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
         }
     }

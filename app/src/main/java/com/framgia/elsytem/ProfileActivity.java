@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.framgia.elsytem.mypackage.Constants;
 import com.framgia.elsytem.mypackage.SessionManager;
 import com.framgia.elsytem.mypackage.UserFunctions;
 
@@ -36,14 +37,7 @@ public class ProfileActivity extends AppCompatActivity {
     ImageView editProfile, avatar;
     TextView name, email;
     SessionManager session;
-    // User name (make variable public to access from outside)
-    public static final String KEY_NAME = "name";
-
-    // Email address (make variable public to access from outside)
-    public static final String KEY_EMAIL = "email";
-
-    // Avatar's image decodable string
-    public static final String KEY_AVATAR = "avatar";
+    Constants constant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +60,10 @@ public class ProfileActivity extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         HashMap<String, String> user;
         user = session.getUserDetails();
-        name.setText(user.get(KEY_NAME));
-        email.setText(user.get(KEY_EMAIL));
-        if (!user.get(KEY_AVATAR).equals("")) avatar.setImageBitmap(BitmapFactory.decodeFile(user
-                .get(KEY_AVATAR)));
+        name.setText(user.get(constant.KEY_NAME));
+        email.setText(user.get(constant.KEY_EMAIL));
+        if (!TextUtils.isEmpty(user.get(constant.KEY_AVATAR))) avatar.setImageBitmap
+                (BitmapFactory.decodeFile(user.get(constant.KEY_AVATAR)));
     }
 
     private void initializeViews() {
@@ -108,16 +102,17 @@ public class ProfileActivity extends AppCompatActivity {
         // dialog box
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_info)
-                .setTitle(R.string.activity_main_alert_dialog_title)
-                .setMessage(R.string.activity_main_alert_dialog_message)
-                .setPositiveButton(R.string.activity_main_alert_dialog_yes, new DialogInterface
+                .setTitle(getString(R.string.activity_main_alert_dialog_title))
+                .setMessage(getString(R.string.activity_main_alert_dialog_message))
+                .setPositiveButton(getString(R.string.activity_main_alert_dialog_yes), new DialogInterface
                         .OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new HttpAsyncTaskSignOut().execute("https://manh-nt.herokuapp.com/logout.json");
+                        new HttpAsyncTaskSignOut().execute(getResources().getString(R.string
+                                .url_logout));
                     }
                 })
-                .setNegativeButton(R.string.activity_main_alert_dialog_no, null)
+                .setNegativeButton(getString(R.string.activity_main_alert_dialog_no), null)
                 .show();
     }
 
@@ -128,8 +123,8 @@ public class ProfileActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             mDialog = new ProgressDialog(ProfileActivity.this);
-            mDialog.setTitle("Contacting Servers");
-            mDialog.setMessage("Signing out ...");
+            mDialog.setTitle(R.string.contacting_servers);
+            mDialog.setMessage(getString(R.string.signing_out));
             mDialog.setIndeterminate(false);
             mDialog.setCancelable(true);
             mDialog.show();
@@ -145,12 +140,10 @@ public class ProfileActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             mDialog.dismiss();
-            if (result.equals("Logout success")) {
-                SessionManager session = new SessionManager(getApplicationContext());
+            if (result.equals(getString(R.string.logout_response))) {
                 session.logoutUser();
                 finish();
             }
-            Log.e(TAG, result);
             Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
         }
     }
@@ -173,7 +166,6 @@ class ViewAdapter extends ArrayAdapter<String> {
         TextView t1 = (TextView) row.findViewById(R.id.textView);
         TextView t2 = (TextView) row.findViewById(R.id.textView2);
         t1.setText(formattedDate[position]);
-
         return row;
     }
 }

@@ -17,6 +17,7 @@ import org.json.JSONObject;
  */
 public class UserFunctions {
     User user;
+    Constants constant;
     static OkHttpClient okHttpClient;
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
@@ -39,20 +40,18 @@ public class UserFunctions {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("email", user.getEmail());
             jsonObject.put("password", user.getPassword());
-            //jsonObject.put("remember_me", isRememberMeChecked);
+            jsonObject.put("remember_me", isRememberMeChecked);
             // 2. build parentJsonObject and put the previous object into this one
             JSONObject parentJsonObject = new JSONObject();
             parentJsonObject.put("session", jsonObject);
             // 3. convert JSONObject to JSON to String
             json = parentJsonObject.toString();
-            Log.e("chehara", json);
             RequestBody requestBody = RequestBody.create(JSON, json);
             Request request = new Request.Builder().url(url).post(requestBody).build();
             Response response = okHttpClient.newCall(request).execute();
             result = response.body().string();
-            Log.e("JSON Object: ", json);
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            Log.e(constant.TAG_USER_FUNCTIONS + " I/OStream", e.getLocalizedMessage());
         }
         // 4. return result
         return result;
@@ -87,7 +86,7 @@ public class UserFunctions {
             result = new JSONObject(jsonData).getString("message");
             Log.e("JSON Object: ", json);
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            Log.e(constant.TAG_USER_FUNCTIONS + " I/OStream", e.getLocalizedMessage());
         }
         return result;
     }
@@ -106,9 +105,8 @@ public class UserFunctions {
             Response response = okHttpClient.newCall(request).execute();
             String jsonData = response.body().string();
             result = new JSONObject(jsonData).getString("message");
-            Log.e("JSON Object: ", json);
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            Log.e(constant.TAG_USER_FUNCTIONS + " I/OStream", e.getLocalizedMessage());
         }
         return result;
     }
@@ -122,20 +120,18 @@ public class UserFunctions {
             jsonObject.put("password", profile.getOld_password());
             jsonObject.put("password_confirmation", profile.getNew_password());
             jsonObject.put("avatar", profile.getAvatar());
-            jsonObject.put("remember_token", profile.getRememberToken());
+            //jsonObject.put("remember_token", profile.getRememberToken());
             JSONObject jsonObjectUser = new JSONObject();
             jsonObjectUser.put("user", jsonObject);
             json = jsonObjectUser.toString();
-            Log.e("Update: ", json);
             RequestBody requestBody = RequestBody.create(JSON, json);
             Request request = new Request.Builder().url(url).patch(requestBody).build();
             Response response = okHttpClient.newCall(request).execute();
             String jsonData = response.body().string();
             //result = new JSONObject(jsonData).getString("message");
             result = jsonData;
-            Log.e("JSON Object: ", json);
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            Log.e(constant.TAG_USER_FUNCTIONS + " I/OStream", e.getLocalizedMessage());
         }
         return result;
     }

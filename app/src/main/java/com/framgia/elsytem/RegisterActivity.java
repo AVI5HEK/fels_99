@@ -10,7 +10,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -31,16 +30,24 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        setUpActionBar();
+        initializeViews();
+        mAlert = new AlertDialogManager();
+    }
+
+    private void initializeViews() {
+        mEtEmail = (EditText) findViewById(R.id.edit_text_email);
+        mEtPassword = (EditText) findViewById(R.id.edit_text_password);
+        mEtPasswordConfirmation = (EditText) findViewById(R.id.edit_text_retype_password);
+        mEtFullName = (EditText) findViewById(R.id.edit_text_full_name);
+    }
+
+    private void setUpActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        mEtEmail = (EditText) findViewById(R.id.edit_text_email);
-        mEtPassword = (EditText) findViewById(R.id.edit_text_password);
-        mEtPasswordConfirmation = (EditText) findViewById(R.id.edit_text_retype_password);
-        mEtFullName = (EditText) findViewById(R.id.edit_text_full_name);
-        mAlert = new AlertDialogManager();
     }
 
     @Override
@@ -118,9 +125,10 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             mDialog.dismiss();
-            Log.e(TAG + " Msg: ", result);
             Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
-            finish();
+            if (result.equals("Sign up success")) {
+                finish();
+            }
         }
     }
 }

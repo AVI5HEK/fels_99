@@ -30,7 +30,7 @@
     <dimen name="upload_avatar_width_and_height">200dp</dimen>
     <dimen name="img_layout_height">50dp</dimen>
     <dimen name="img_layout_width">100dp</dimen>
-    <dimen name="person_layout_marginleft">25dp</dimen>
+    <dimen name="person_layout_marginleft">5dp</dimen>
     <dimen name="person_layout_marginright">15dp</dimen>
     <dimen name="person_layout_margintop">26dp</dimen>
     <dimen name="em_layout_height">30dp</dimen>

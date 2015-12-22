@@ -24,10 +24,9 @@
 
         <ImageView
             android:id="@+id/avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_person_outline_black_36dp"
-            android:layout_marginTop="@dimen/text_title_activity_login_margin_top"/>
+            android:layout_width="@dimen/upload_avatar_width_and_height"
+            android:layout_height="@dimen/upload_avatar_width_and_height"
+            android:src="@drawable/ic_person_outline_black_36dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -132,14 +131,14 @@
 
         <Button
             android:id="@+id/words_btn"
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:text="@string/content_profile_words_btn_text"/>
 
         <Button
             android:id="@+id/lesson_btn"
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="@string/content_profile_lesson_btn_text"/>
