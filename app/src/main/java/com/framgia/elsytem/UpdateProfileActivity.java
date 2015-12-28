@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +27,10 @@ import com.framgia.elsytem.mypackage.SessionManager;
 import com.framgia.elsytem.mypackage.UserFunctions;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -46,6 +51,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private Constants mConstant;
     Bitmap bitmap;
     ProgressDialog pDialog;
+    File file;
+    String imageDataString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +65,16 @@ public class UpdateProfileActivity extends AppCompatActivity {
         user = session.getUserDetails();
         mEtemail.setText(user.get(mConstant.KEY_EMAIL));
         mEtFullName.setText(user.get(mConstant.KEY_NAME));
-        imgDecodableString = user.get(mConstant.KEY_AVATAR);
-        if (!imgDecodableString.isEmpty()) {
-            if (isUrl(imgDecodableString)) {
-                new LoadImage().execute(imgDecodableString);
-            } else mIvAvatar.setImageBitmap(BitmapFactory.decodeFile(imgDecodableString));
+        imageDataString = user.get(mConstant.KEY_AVATAR);
+        if (!imageDataString.isEmpty()) {
+            if (isUrl(imageDataString)) {
+                new LoadImage().execute(imageDataString);
+            } else {
+                byte[] decodedString = decodeImage(imageDataString);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0,
+                        decodedString.length);
+                mIvAvatar.setImageBitmap(decodedByte);
+            }
         }
         mAuthToken = user.get(mConstant.KEY_AUTH_TOKEN);
         mIvAvatar.setOnClickListener(new View.OnClickListener() {
@@ -160,9 +172,28 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 imgDecodableString = cursor.getString(columnIndex);
                 cursor.close();
-                // Set the Image in ImageView after decoding the String
-                mIvAvatar.setImageBitmap(BitmapFactory
-                        .decodeFile(imgDecodableString));
+
+                // creating file from the file path
+                file = new File(imgDecodableString);
+                try {
+                    // Reading a Image file from file system
+                    FileInputStream imageInFile = new FileInputStream(file);
+                    byte imageData[] = new byte[(int) file.length()];
+                    imageInFile.read(imageData);
+                    // Converting Image byte array into Base64 String
+                    imageDataString = encodeImage(imageData);
+                    imageInFile.close();
+                    // Converting a Base64 String into Image byte array
+                    byte[] decodedString = decodeImage(imageDataString);
+                    // Set the Image in ImageView after decoding the String
+                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0,
+                            decodedString.length);
+                    mIvAvatar.setImageBitmap(decodedByte);
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, e.toString());
+                } catch (IOException ioe) {
+                    Log.e(TAG, ioe.toString());
+                }
             } else {
                 Toast.makeText(this, getString(R.string.toast_message_pick_image),
                         Toast.LENGTH_LONG).show();
@@ -171,6 +202,27 @@ public class UpdateProfileActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.toast_message_pick_image_error), Toast
                     .LENGTH_LONG).show();
         }
+    }
+
+
+    /**
+     * Encodes the byte array into base64 string
+     *
+     * @param imageByteArray - byte array
+     * @return String a {@link java.lang.String}
+     */
+    public static String encodeImage(byte[] imageByteArray) {
+        return Base64.encodeToString(imageByteArray, Base64.DEFAULT);
+    }
+
+    /**
+     * Decodes the base64 string into byte array
+     *
+     * @param imageDataString - a {@link java.lang.String}
+     * @return byte array
+     */
+    public static byte[] decodeImage(String imageDataString) {
+        return Base64.decode(imageDataString, Base64.DEFAULT);
     }
 
     @Override
@@ -235,7 +287,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
             profile.setEmail(mEmail);
             profile.setNew_password(mNewPassword);
             profile.setPassword_confirmation(mPasswordConfirmation);
-            profile.setAvatar(imgDecodableString);
+            profile.setAvatar(imageDataString);
             profile.setAuthToken(mAuthToken);
             UserFunctions userFunction = new UserFunctions();
             return userFunction.updateProfile(urls[0], profile);
@@ -258,7 +310,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 session.deleteSessionData();
                 // creating new session with updated data
                 session.createLoginSession(Integer.parseInt(mId), mFullName, mEmail,
-                        imgDecodableString, user.get(mConstant.KEY_AUTH_TOKEN), Integer.parseInt
+                        imageDataString, user.get(mConstant.KEY_AUTH_TOKEN), Integer.parseInt
                                 (user.get(mConstant.KEY_REMEMBER_ME)));
                 Toast.makeText(getBaseContext(), getString(R.string.toast_message_update_successful), Toast.LENGTH_LONG).show();
             } else Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();

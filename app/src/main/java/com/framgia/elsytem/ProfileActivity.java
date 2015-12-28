@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -57,11 +58,11 @@ public class ProfileActivity extends AppCompatActivity {
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         formattedDate[0] = df.format(c.getTime());
         ViewAdapter v = new ViewAdapter(this, formattedDate);
-        lesson=(Button)findViewById(R.id.lesson_btn);
+        lesson = (Button) findViewById(R.id.lesson_btn);
         lesson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplication(),QuestionActivity.class));
+                startActivity(new Intent(getApplication(), QuestionActivity.class));
             }
         });
         listViewProfile.setAdapter(v);
@@ -80,7 +81,12 @@ public class ProfileActivity extends AppCompatActivity {
         if (!user.get(constant.KEY_AVATAR).isEmpty()) {
             if (isUrl(user.get(constant.KEY_AVATAR))) {
                 new LoadImage().execute(user.get(constant.KEY_AVATAR));
-            } else avatar.setImageBitmap(BitmapFactory.decodeFile(user.get(constant.KEY_AVATAR)));
+            } else {
+                byte[] decodedString = Base64.decode(user.get(constant.KEY_AVATAR), Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0,
+                        decodedString.length);
+                avatar.setImageBitmap(decodedByte);
+            }
         }
     }
 
