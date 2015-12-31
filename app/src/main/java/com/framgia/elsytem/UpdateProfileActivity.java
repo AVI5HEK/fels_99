@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,20 +27,23 @@ import com.framgia.elsytem.mypackage.SessionManager;
 import com.framgia.elsytem.mypackage.Url;
 import com.framgia.elsytem.mypackage.UserFunctions;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 
 public class UpdateProfileActivity extends AppCompatActivity {
     private static final String TAG = "UpdateProfileActivity";
     private static int RESULT_LOAD_IMG = 1;
-    String imgDecodableString;
+    String filePath;
     // Session Manager Class
     SessionManager session;
     // hashmap for holding user details from the session
@@ -54,7 +56,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
     Bitmap bitmap;
     ProgressDialog pDialog;
     File file;
-    String imageDataString;
+    String imageDataBase64String;
+    Uri avatarUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,18 +70,21 @@ public class UpdateProfileActivity extends AppCompatActivity {
         user = session.getUserDetails();
         mEtemail.setText(user.get(Constants.KEY_EMAIL));
         mEtFullName.setText(user.get(Constants.KEY_NAME));
-        imageDataString = user.get(Constants.KEY_AVATAR);
-        if (!imageDataString.isEmpty()) {
-            // checks if imageDataString is a url
-            if (isUrl(imageDataString)) {
-                new LoadImage().execute(imageDataString);
+        avatarUri = Uri.parse(user.get(Constants.KEY_AVATAR));
+        /*if (!imageDataBase64String.isEmpty()) {
+            // checks if imageDataBase64String is a url
+            if (isUrl(imageDataBase64String)) {
+                new LoadImage().execute(imageDataBase64String);
             } else {
-                byte[] decodedString = decodeImage(imageDataString);
+                byte[] decodedString = decodeImage(imageDataBase64String);
                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0,
                         decodedString.length);
                 mIvAvatar.setImageBitmap(decodedByte);
             }
-        }
+        }*/
+        imageDataBase64String = user.get(Constants.KEY_AVATAR);
+        if (!user.get(Constants.KEY_AVATAR).isEmpty())
+            mLoadAvatar(user.get(Constants.KEY_AVATAR));
         mAuthToken = user.get(Constants.KEY_AUTH_TOKEN);
         mIvAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,8 +134,21 @@ public class UpdateProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * AsyncTask class for Loading Image from a url
+     * Checks if avatar is a uri
      */
+    public boolean isUri(String avatar) {
+        URI uri = null;
+        try {
+            uri = new URI(avatar);
+        } catch (URISyntaxException e) {
+            Log.v(TAG, e.toString());
+        }
+        return uri != null;
+    }
+
+    /**
+     * AsyncTask class for Loading Image from a url
+     *//*
     private class LoadImage extends AsyncTask<String, String, Bitmap> {
         @Override
         protected void onPreExecute() {
@@ -158,7 +177,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         .toast_message_load_image_error), Toast.LENGTH_LONG).show();
             }
         }
-    }
+    }*/
 
     private void initializeViews() {
         mEtemail = (EditText) findViewById(R.id.edit_text_email);
@@ -199,25 +218,23 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 // Move to first row
                 cursor.moveToFirst();
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                imgDecodableString = cursor.getString(columnIndex);
+                filePath = cursor.getString(columnIndex);
                 cursor.close();
 
                 // creating file from the file path
-                file = new File(imgDecodableString);
+                file = new File(filePath);
+                // load avatar in imageView
+                avatarUri = mGetUri(filePath);
+                Log.e(TAG, "Uri: " + mGetUri(filePath).toString());
+                mLoadAvatar(avatarUri.toString());
                 try {
                     // Reading a Image file from file system
                     FileInputStream imageInFile = new FileInputStream(file);
                     byte imageData[] = new byte[(int) file.length()];
                     imageInFile.read(imageData);
                     // Converting Image byte array into Base64 String
-                    imageDataString = encodeImage(imageData);
+                    imageDataBase64String = encodeImage(imageData);
                     imageInFile.close();
-                    // Converting a Base64 String into Image byte array
-                    byte[] decodedString = decodeImage(imageDataString);
-                    // Set the Image in ImageView after decoding the String
-                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0,
-                            decodedString.length);
-                    mIvAvatar.setImageBitmap(decodedByte);
                 } catch (FileNotFoundException e) {
                     Log.e(TAG, e.toString());
                 } catch (IOException ioe) {
@@ -233,6 +250,65 @@ public class UpdateProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void mLoadAvatar(String avatar) {
+        if (!avatar.isEmpty()) {
+            if (isUrl(avatar)) {
+                Picasso.with(this)
+                        .load(avatar)
+                        .resize(100, 100)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_add_a_photo_black_36dp)
+                        .error(R.drawable.ico_fail)
+                        .into(mIvAvatar);
+            } else {
+                Uri uri = Uri.parse(avatar);
+                Picasso.with(this)
+                        .load(uri)
+                        .resize(100, 100)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_add_a_photo_black_36dp)
+                        .error(R.drawable.ico_fail)
+                        .into(mIvAvatar);
+            } /*else {
+                // Write image byte array from base64 string into file system
+                mCreateFileFromBase64String(avatar);
+                // get the uri of the created image
+                Uri uri = mGetUri(getFilesDir() + Constants.KEY_AVATAR_FILE_NAME);
+                Log.e(TAG, "File Path: " + uri.toString());
+                Picasso.with(this)
+                        .load(uri)
+                        .resize(100, 100)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_add_a_photo_black_36dp)
+                        .error(R.drawable.ico_fail)
+                        .into(mIvAvatar);
+            }*/
+        }
+    }
+
+    private Uri mGetUri(String filePath) {
+        return Uri.fromFile(new File(filePath));
+    }
+
+    private void mCreateFileFromBase64String(String avatar) {
+        FileOutputStream imageOutputFile = null;
+        try {
+            imageOutputFile = new FileOutputStream(getFilesDir()
+                    + Constants.KEY_AVATAR_FILE_NAME, false);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            imageOutputFile.write(decodeImage(avatar));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            imageOutputFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Encodes the byte array into base64 string
@@ -265,11 +341,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-                finish();
+                onBackPressed();
                 return true;
             // Respond to the action bar's 'Done' button
             case R.id.action_update:
@@ -309,7 +381,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
             profile.setEmail(mEmail);
             profile.setNew_password(mNewPassword);
             profile.setPassword_confirmation(mPasswordConfirmation);
-            profile.setAvatar(imageDataString);
+            profile.setAvatar(imageDataBase64String);
             profile.setAuthToken(mAuthToken);
             UserFunctions userFunction = new UserFunctions();
             return userFunction.updateProfile(urls[0], profile);
@@ -332,8 +404,9 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 session.deleteSessionData();
                 // creating new session with updated data
                 session.createLoginSession(Integer.parseInt(mId), mFullName, mEmail,
-                        imageDataString, user.get(Constants.KEY_AUTH_TOKEN), Integer.parseInt
+                        avatarUri.toString(), user.get(Constants.KEY_AUTH_TOKEN), Integer.parseInt
                                 (user.get(Constants.KEY_REMEMBER_ME)));
+                Log.e(TAG, "avatar: " + imageDataBase64String);
                 Toast.makeText(getBaseContext(), getString(R.string.toast_message_update_successful), Toast.LENGTH_LONG).show();
             } else Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
         }

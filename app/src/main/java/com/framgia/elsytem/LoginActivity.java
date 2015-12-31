@@ -56,13 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         // check in session if user is logged in. If so, go to profile activity
         if (session.isLoggedInAndRemember()) {
             //go to ProfileActivity
-            /*Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(i);
-            finish();*/
-            //must remove
-            Intent i = new Intent(getApplicationContext(), CategoriesActivity.class);
-            startActivity(i);
-            finish();
+            mStartProfileActivity();
 
         } else {
             initializeViews();
@@ -99,6 +93,12 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void mStartProfileActivity() {
+        Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
+        startActivity(i);
+        finish();
     }
 
     private void mSignIn() {
@@ -228,9 +228,7 @@ public class LoginActivity extends AppCompatActivity {
                         session.createLoginSession(id, name, email, avatar, authToken,
                                 mRememberMe);
                     //now finish this activity and go to ProfileActivity
-                    Intent i = new Intent(getApplicationContext(), LearnedActivity.class);
-                    startActivity(i);
-                    finish();
+                    mStartProfileActivity();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
