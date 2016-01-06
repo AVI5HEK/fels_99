@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.framgia.elsytem">
+<manifest
+    package="com.framgia.elsytem"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -18,9 +19,9 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
@@ -30,13 +31,17 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.framgia.elsytem.LoginActivity" />
+                android:value="com.framgia.elsytem.LoginActivity"/>
         </activity>
         <activity
             android:name=".UpdateProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_update_profile"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.framgia.elsytem.ProfileActivity"/>
+        </activity>
         <activity
             android:name=".QuestionActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -57,32 +62,32 @@
             android:name=".ProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_profile"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".WordlistActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_wordlist"
             android:theme="@style/AppTheme.NoActionBar">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".ProfileActivity" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ProfileActivity"/>
         </activity>
         <activity
             android:name=".CategoriesActivity"
-            android:label="@string/title_activity_categories"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".ProfileActivity" >
+            android:label="@string/title_activity_categories"
+            android:parentActivityName=".ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ProfileActivity" />
+                android:value=".ProfileActivity"/>
         </activity>
         <activity
             android:name=".LearnedActivity"
-            android:label="@string/title_activity_learned"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_learned"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

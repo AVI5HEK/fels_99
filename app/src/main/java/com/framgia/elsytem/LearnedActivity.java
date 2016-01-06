@@ -129,11 +129,11 @@ public class LearnedActivity extends AppCompatActivity {
                 if (!mIsSpinnerOption){
                     item.clear();
                     option = spinnerOption.getSelectedItem().toString();
-                if (option.equalsIgnoreCase(Constants.all)) {
+                if (option.equalsIgnoreCase(Constants.OPTION_ALL)) {
                     option = Constants.all;
-                } else if (option.equalsIgnoreCase(Constants.learned)) {
+                } else if (option.equalsIgnoreCase(Constants.OPTION_LEARN)) {
                     option = Constants.learned;
-                } else if (option.equalsIgnoreCase(Constants.not_learned)) {
+                } else if (option.equalsIgnoreCase(Constants.OPTION_NOT_LEARN)) {
                     option = Constants.not_learned;
                 }
                     String text = spinnerCategory.getSelectedItem().toString();

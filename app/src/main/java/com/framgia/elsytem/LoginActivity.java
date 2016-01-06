@@ -106,12 +106,12 @@ public class LoginActivity extends AppCompatActivity {
         mPassword = password.getText().toString();
         if (checkBoxRememberMe.isChecked()) mRememberMe = 1;
         else mRememberMe = 0;
-        if (!isConnected())
+        if (!isConnected()) {
             mShowDialog(LoginActivity.this, getString(R.string
                             .connection_error_title_activity_login),
                     getString(R.string.connection_error_message_activity_login),
                     false);
-        if (!mEmail.isEmpty() && !mPassword.isEmpty()) {
+        } else if (!mEmail.isEmpty() && !mPassword.isEmpty()) {
             new HttpAsyncTaskSignIn().execute(Url.url_sign_in);
         } else if (mEmail.isEmpty()) {
             Toast.makeText(getApplicationContext(), getString(R.string

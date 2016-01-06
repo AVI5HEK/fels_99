@@ -16,7 +16,7 @@
     <View
         android:layout_width="@dimen/content_profile_scrollview_weight"
         android:layout_height="@dimen/content_question_text_margin_left"
-        android:layout_marginTop="@dimen/choice_text_margin_Top"
+        android:layout_marginTop="@dimen/content_question_text_margin_left"
         android:layout_marginBottom="@dimen/content_question_view_height"
         android:background="@android:color/black"/>
     <TextView

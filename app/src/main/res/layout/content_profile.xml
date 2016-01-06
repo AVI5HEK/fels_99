@@ -120,20 +120,32 @@
         <View
             android:id="@+id/separator"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/content_profile_scrollview_weight"
             android:layout_below="@id/linear2"
             android:background="@color/colorPrimary"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="@android:style/Widget.ProgressBar.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/separator"
+            android:layout_marginTop="@dimen/upload_avatar_width_and_height"/>
 
         <ListView
             android:id="@+id/list_view"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/list_user_activity_height"
-            android:layout_below="@id/separator"/>
+            android:layout_below="@id/separator"
+            android:divider="@color/colorAccent"
+            android:dividerHeight="@dimen/content_profile_scrollview_weight"
+            android:fastScrollEnabled="true"
+            android:nestedScrollingEnabled="true"/>
 
         <View
             android:id="@+id/separator_2"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/content_profile_scrollview_weight"
             android:layout_below="@id/list_view"
             android:background="@color/colorPrimary"/>
 
